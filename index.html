@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>فحص السرعة الحقيقي - MySpeed</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #1e293b; padding: 2rem; border-radius: 1rem; text-align: center; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .speed-value { font-size: 3.5rem; font-weight: bold; color: #38bdf8; margin: 10px 0; }
+        .unit { font-size: 1.2rem; color: #94a3b8; }
+        .stats { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; }
+        button:disabled { background: #475569; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>اختبار السرعة</h2>
+    <div class="speed-value" id="mbps">0.0</div>
+    <div class="unit">Mbps</div>
+    
+    <div class="stats">
+        <div><small>Ping</small><br><span id="ping">--</span> ms</div>
+        <div><small>حجم الملف</small><br>5 MB</div>
+    </div>
+    <br>
+    <button id="startBtn" onclick="startTest()">ابدأ الاختبار الحقيقي</button>
+</div>
