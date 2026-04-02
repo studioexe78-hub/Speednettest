@@ -3,69 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فحص سرعة الإنترنت - SpeedTest</title>
+    <title>SpeedTest Elite - فحص السرعة الاحترافي</title>
     <style>
-        :root { --main-color: #00f2fe; }
-        body { background: #0b0e14; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .speed-display { margin: 20px 0; }
-        #speedValue { font-size: 60px; font-weight: bold; color: var(--main-color); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
-        .unit { font-size: 18px; color: #8b949e; }
-        .info { display: flex; justify-content: space-around; margin: 20px 0; font-size: 14px; color: #c9d1d9; border-top: 1px solid #30363d; padding-top: 15px; }
-        button { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; width: 100%; transition: 0.3s; }
-        button:active { transform: scale(0.95); }
-        #progress { width: 100%; background: #30363d; height: 5px; border-radius: 5px; margin-top: 10px; display: none; overflow: hidden; }
-        #progressBar { width: 0%; height: 100%; background: var(--main-color); transition: 0.1s; }
+        :root { --neon: #00f2fe; --accent: #4facfe; --bg: #0d1117; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        .glass-card { 
+            background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); padding: 40px;
+            border-radius: 30px; width: 350px; text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .main-speed { position: relative; margin: 30px 0; }
+        #speedValue { font-size: 80px; font-weight: 900; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        
+        .unit { font-size: 20px; color: #8b949e; letter-spacing: 2px; }
+
+        /* بار التحميل المتحرك */
+        .progress-container { width: 100%; background: #21262d; height: 8px; border-radius: 10px; margin: 25px 0; overflow: hidden; position: relative; }
+        #progressBar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon), var(--accent)); box-shadow: 0 0 15px var(--neon); transition: 0.2s; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: #161b22; padding: 15px; border-radius: 15px; border: 1px solid #30363d; }
+        .stat-box small { color: #8b949e; display: block; margin-bottom: 5px; }
+        .stat-box span { font-weight: bold; color: var(--neon); }
+
+        button { 
+            background: linear-gradient(45deg, var(--neon), var(--accent));
+            color: #000; border: none; padding: 18px; font-size: 18px; font-weight: bold;
+            border-radius: 15px; cursor: pointer; width: 100%;
+            transition: 0.3s; box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4); }
+        button:disabled { filter: grayscale(1); cursor: wait; }
+
+        /* تأثير النبض أثناء الفحص */
+        .pulse { animation: pulse-animation 1.5s infinite; }
+        @keyframes pulse-animation { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 style="margin:0; font-size: 20px;">SpeedTest Pro</h2>
-    <div class="speed-display">
-        <div id="speedValue">0.0</div>
-        <div class="unit">Mbps</div>
-    </div>
+<div class="glass-card">
+    <h2 style="margin:0; font-size: 18px; color: var(--neon); text-transform: uppercase;">SpeedTest Elite</h2>
     
-    <div id="progress"><div id="progressBar"></div></div>
-
-    <div class="info">
-        <div>بنج: <span id="pingVal">--</span>ms</div>
-        <div>الحالة: <span id="status">جاهز</span></div>
+    <div class="main-speed">
+        <div id="speedValue">0.0</div>
+        <div class="unit">MBPS</div>
     </div>
 
-    <button id="startBtn" onclick="runSpeedTest()">ابدأ الفحص</button>
+    <div class="progress-container">
+        <div id="progressBar"></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <small>PING</small>
+            <span id="pingVal">--</span> <small style="display:inline">ms</small>
+        </div>
+        <div class="stat-box">
+            <small>SENSITIVITY</small>
+            <span id="jitterVal">Stable</span>
+        </div>
+    </div>
+
+    <button id="startBtn" onclick="runEnhancedTest()">ابدأ فحص النخبة</button>
 </div>
 
 <script>
-    // رابط ملف فحص سريع ومضمون (صورة من ويكيبيديا تدعم HTTPS و CORS)
     const testUrl = "https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg";
-    const fileSize = 12000000; // حجم الملف التقريبي بالبايت (حوالي 11.5MB)
+    const fileSize = 12000000; 
 
-    async function runSpeedTest() {
+    async function runEnhancedTest() {
         const btn = document.getElementById('startBtn');
         const speedText = document.getElementById('speedValue');
-        const pingText = document.getElementById('pingVal');
-        const statusText = document.getElementById('status');
-        const prog = document.getElementById('progress');
         const bar = document.getElementById('progressBar');
+        const pingText = document.getElementById('pingVal');
 
         btn.disabled = true;
-        btn.style.opacity = "0.5";
-        prog.style.display = "block";
-        statusText.innerText = "جاري الفحص...";
+        btn.innerText = "جاري الفحص...";
+        speedText.classList.add('pulse');
 
-        // 1. قياس البنج (Ping)
+        // 1. فحص البنج
         const pStart = Date.now();
-        try {
-            await fetch("https://www.google.com/favicon.ico", { mode: 'no-cors', cache: 'no-store' });
-            pingText.innerText = Date.now() - pStart;
-        } catch(e) { pingText.innerText = "??"; }
+        await fetch("https://www.google.com/favicon.ico", { mode: 'no-cors', cache: 'no-store' });
+        pingText.innerText = Date.now() - pStart;
 
-        // 2. فحص التحميل الحقيقي (Download)
+        // 2. فحص التحميل
         const startTime = Date.now();
         try {
-            const response = await fetch(testUrl + "?t=" + startTime);
+            const response = await fetch(testUrl + "?nocache=" + startTime);
             const reader = response.body.getReader();
             let received = 0;
 
@@ -74,26 +102,19 @@
                 if (done) break;
                 received += value.length;
 
-                // تحديث النسبة المئوية
                 let percent = (received / fileSize) * 100;
                 bar.style.width = Math.min(percent, 100) + "%";
 
-                // حساب السرعة الحالية
-                let timeNow = (Date.now() - startTime) / 1000;
-                if (timeNow > 0) {
-                    let mbps = ((received * 8) / (timeNow * 1024 * 1024)).toFixed(1);
+                let timeElapsed = (Date.now() - startTime) / 1000;
+                if (timeElapsed > 0) {
+                    let mbps = ((received * 8) / (timeElapsed * 1024 * 1024)).toFixed(1);
                     speedText.innerText = mbps;
                 }
             }
+        } catch (e) { alert("خطأ في الشبكة"); }
 
-            statusText.innerText = "اكتمل";
-        } catch (error) {
-            statusText.innerText = "فشل الاتصال";
-            console.error(error);
-        }
-
+        speedText.classList.remove('pulse');
         btn.disabled = false;
-        btn.style.opacity = "1";
         btn.innerText = "إعادة الفحص";
     }
 </script>
