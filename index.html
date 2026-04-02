@@ -1,123 +1,152 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedTest Elite - فحص السرعة الاحترافي</title>
+    <title>REDLINE - Ultimate Speedtest</title>
     <style>
-        :root { --neon: #00f2fe; --accent: #4facfe; --bg: #0d1117; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        :root { --primary: #ff4b2b; --secondary: #ff416c; --bg: #0a0a0a; --card: #121212; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 90%; max-width: 450px; background: var(--card); border-radius: 30px; padding: 40px; box-shadow: 0 20px 40px rgba(255, 75, 43, 0.15); border: 1px solid #1f1f1f; text-align: center; }
+        h1 { color: var(--primary); font-size: 24px; letter-spacing: 3px; margin-bottom: 30px; }
         
-        .glass-card { 
-            background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); padding: 40px;
-            border-radius: 30px; width: 350px; text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
+        .gauge-section { position: relative; height: 220px; display: flex; flex-direction: column; justify-content: center; }
+        #speedValue { font-size: 85px; font-weight: 900; background: linear-gradient(to bottom, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        .unit { font-size: 18px; color: #666; font-weight: bold; }
 
-        .main-speed { position: relative; margin: 30px 0; }
-        #speedValue { font-size: 80px; font-weight: 900; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-        
-        .unit { font-size: 20px; color: #8b949e; letter-spacing: 2px; }
+        .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 30px 0; }
+        .m-box { background: #1a1a1a; padding: 15px; border-radius: 15px; border: 1px solid #222; }
+        .m-box small { display: block; font-size: 10px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .m-box span { font-weight: bold; color: var(--primary); font-size: 16px; }
 
-        /* بار التحميل المتحرك */
-        .progress-container { width: 100%; background: #21262d; height: 8px; border-radius: 10px; margin: 25px 0; overflow: hidden; position: relative; }
-        #progressBar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon), var(--accent)); box-shadow: 0 0 15px var(--neon); transition: 0.2s; }
+        .progress-bar { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); box-shadow: 0 0 10px var(--primary); transition: 0.3s; }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .stat-box { background: #161b22; padding: 15px; border-radius: 15px; border: 1px solid #30363d; }
-        .stat-box small { color: #8b949e; display: block; margin-bottom: 5px; }
-        .stat-box span { font-weight: bold; color: var(--neon); }
+        button { background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        button:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(255, 75, 43, 0.4); }
+        button:disabled { background: #333; cursor: wait; opacity: 0.6; }
 
-        button { 
-            background: linear-gradient(45deg, var(--neon), var(--accent));
-            color: #000; border: none; padding: 18px; font-size: 18px; font-weight: bold;
-            border-radius: 15px; cursor: pointer; width: 100%;
-            transition: 0.3s; box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
-        }
-        button:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4); }
-        button:disabled { filter: grayscale(1); cursor: wait; }
-
-        /* تأثير النبض أثناء الفحص */
-        .pulse { animation: pulse-animation 1.5s infinite; }
-        @keyframes pulse-animation { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .history { margin-top: 30px; text-align: left; }
+        .history h3 { font-size: 14px; color: #444; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        #historyList { list-style: none; padding: 0; max-height: 150px; overflow-y: auto; font-size: 12px; }
+        .h-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+        .h-item span { color: #888; }
     </style>
 </head>
 <body>
 
-<div class="glass-card">
-    <h2 style="margin:0; font-size: 18px; color: var(--neon); text-transform: uppercase;">SpeedTest Elite</h2>
+<div class="app-container">
+    <h1>REDLINE SPEED</h1>
     
-    <div class="main-speed">
+    <div class="gauge-section">
         <div id="speedValue">0.0</div>
         <div class="unit">MBPS</div>
+        <div id="testType" style="font-size: 12px; color: #ff4b2b; margin-top: 10px; font-weight: bold;">READY</div>
     </div>
 
-    <div class="progress-container">
-        <div id="progressBar"></div>
+    <div class="progress-bar"><div id="barFill"></div></div>
+
+    <div class="metrics">
+        <div class="m-box"><small>Ping</small><span id="ping">--</span></div>
+        <div class="m-box"><small>Download</small><span id="down">--</span></div>
+        <div class="m-box"><small>Upload</small><span id="up">--</span></div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-box">
-            <small>PING</small>
-            <span id="pingVal">--</span> <small style="display:inline">ms</small>
-        </div>
-        <div class="stat-box">
-            <small>SENSITIVITY</small>
-            <span id="jitterVal">Stable</span>
-        </div>
-    </div>
+    <button id="startBtn" onclick="runFullTest()">Start Test</button>
 
-    <button id="startBtn" onclick="runEnhancedTest()">ابدأ فحص النخبة</button>
+    <div class="history">
+        <h3>LATEST RESULTS</h3>
+        <div id="historyList"></div>
+    </div>
 </div>
 
 <script>
-    const testUrl = "https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg";
-    const fileSize = 12000000; 
+    const config = {
+        downUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%287eaed92d-9473-4560-b88d-797593906660%29.jpg",
+        upUrl: "https://httpbin.org/post",
+        downSize: 5242880 // 5MB
+    };
 
-    async function runEnhancedTest() {
+    function updateUI(id, val) { document.getElementById(id).innerText = val; }
+
+    async function runFullTest() {
         const btn = document.getElementById('startBtn');
-        const speedText = document.getElementById('speedValue');
-        const bar = document.getElementById('progressBar');
-        const pingText = document.getElementById('pingVal');
-
+        const bar = document.getElementById('barFill');
+        const type = document.getElementById('testType');
+        
         btn.disabled = true;
-        btn.innerText = "جاري الفحص...";
-        speedText.classList.add('pulse');
-
-        // 1. فحص البنج
+        bar.style.width = "0%";
+        
+        // 1. PING
+        type.innerText = "MEASURING PING...";
         const pStart = Date.now();
         await fetch("https://www.google.com/favicon.ico", { mode: 'no-cors', cache: 'no-store' });
-        pingText.innerText = Date.now() - pStart;
+        const ping = Date.now() - pStart;
+        updateUI('ping', ping);
 
-        // 2. فحص التحميل
-        const startTime = Date.now();
-        try {
-            const response = await fetch(testUrl + "?nocache=" + startTime);
-            const reader = response.body.getReader();
-            let received = 0;
+        // 2. DOWNLOAD
+        type.innerText = "TESTING DOWNLOAD...";
+        const dStart = Date.now();
+        const response = await fetch(config.downUrl + "?cb=" + dStart);
+        const reader = response.body.getReader();
+        let received = 0;
+        
+        while(true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            received += value.length;
+            let time = (Date.now() - dStart) / 1000;
+            let mbps = ((received * 8) / (time * 1024 * 1024)).toFixed(1);
+            updateUI('speedValue', mbps);
+            bar.style.width = (received / config.downSize * 50) + "%";
+        }
+        const finalDown = document.getElementById('speedValue').innerText;
+        updateUI('down', finalDown);
 
-            while(true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                received += value.length;
+        // 3. UPLOAD (Using a dummy 2MB data blob)
+        type.innerText = "TESTING UPLOAD...";
+        const upData = new Uint8Array(2000000); 
+        const uStart = Date.now();
+        
+        await fetch(config.upUrl, {
+            method: 'POST',
+            body: upData
+        });
+        
+        const uEnd = Date.now();
+        const uDuration = (uEnd - uStart) / 1000;
+        const upMbps = ((upData.length * 8) / (uDuration * 1024 * 1024)).toFixed(1);
+        
+        updateUI('speedValue', upMbps);
+        updateUI('up', upMbps);
+        bar.style.width = "100%";
+        type.innerText = "TEST COMPLETE";
 
-                let percent = (received / fileSize) * 100;
-                bar.style.width = Math.min(percent, 100) + "%";
-
-                let timeElapsed = (Date.now() - startTime) / 1000;
-                if (timeElapsed > 0) {
-                    let mbps = ((received * 8) / (timeElapsed * 1024 * 1024)).toFixed(1);
-                    speedText.innerText = mbps;
-                }
-            }
-        } catch (e) { alert("خطأ في الشبكة"); }
-
-        speedText.classList.remove('pulse');
+        saveResult(finalDown, upMbps, ping);
         btn.disabled = false;
-        btn.innerText = "إعادة الفحص";
+        btn.innerText = "Retest";
     }
-</script>
 
+    function saveResult(d, u, p) {
+        let history = JSON.parse(localStorage.getItem('speedHistory') || "[]");
+        history.unshift({d, u, p, time: new Date().toLocaleTimeString()});
+        if(history.length > 5) history.pop();
+        localStorage.setItem('speedHistory', JSON.stringify(history));
+        loadHistory();
+    }
+
+    function loadHistory() {
+        const list = document.getElementById('historyList');
+        let history = JSON.parse(localStorage.getItem('speedHistory') || "[]");
+        list.innerHTML = history.map(i => `
+            <div class="h-item">
+                <b>${i.d} ↓ / ${i.u} ↑</b>
+                <span>${i.p}ms | ${i.time}</span>
+            </div>
+        `).join('');
+    }
+
+    loadHistory();
+</script>
 </body>
 </html>
