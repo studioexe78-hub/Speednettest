@@ -2,28 +2,101 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>فحص السرعة الحقيقي - MySpeed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص سرعة الإنترنت - SpeedTest</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #1e293b; padding: 2rem; border-radius: 1rem; text-align: center; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .speed-value { font-size: 3.5rem; font-weight: bold; color: #38bdf8; margin: 10px 0; }
-        .unit { font-size: 1.2rem; color: #94a3b8; }
-        .stats { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px; }
-        button { background: #38bdf8; color: #0f172a; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; }
-        button:disabled { background: #475569; cursor: not-allowed; }
+        :root { --main-color: #00f2fe; }
+        body { background: #0b0e14; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .speed-display { margin: 20px 0; }
+        #speedValue { font-size: 60px; font-weight: bold; color: var(--main-color); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+        .unit { font-size: 18px; color: #8b949e; }
+        .info { display: flex; justify-content: space-around; margin: 20px 0; font-size: 14px; color: #c9d1d9; border-top: 1px solid #30363d; padding-top: 15px; }
+        button { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; width: 100%; transition: 0.3s; }
+        button:active { transform: scale(0.95); }
+        #progress { width: 100%; background: #30363d; height: 5px; border-radius: 5px; margin-top: 10px; display: none; overflow: hidden; }
+        #progressBar { width: 0%; height: 100%; background: var(--main-color); transition: 0.1s; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>اختبار السرعة</h2>
-    <div class="speed-value" id="mbps">0.0</div>
-    <div class="unit">Mbps</div>
-    
-    <div class="stats">
-        <div><small>Ping</small><br><span id="ping">--</span> ms</div>
-        <div><small>حجم الملف</small><br>5 MB</div>
+<div class="card">
+    <h2 style="margin:0; font-size: 20px;">SpeedTest Pro</h2>
+    <div class="speed-display">
+        <div id="speedValue">0.0</div>
+        <div class="unit">Mbps</div>
     </div>
-    <br>
-    <button id="startBtn" onclick="startTest()">ابدأ الاختبار الحقيقي</button>
+    
+    <div id="progress"><div id="progressBar"></div></div>
+
+    <div class="info">
+        <div>بنج: <span id="pingVal">--</span>ms</div>
+        <div>الحالة: <span id="status">جاهز</span></div>
+    </div>
+
+    <button id="startBtn" onclick="runSpeedTest()">ابدأ الفحص</button>
 </div>
+
+<script>
+    // رابط ملف فحص سريع ومضمون (صورة من ويكيبيديا تدعم HTTPS و CORS)
+    const testUrl = "https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg";
+    const fileSize = 12000000; // حجم الملف التقريبي بالبايت (حوالي 11.5MB)
+
+    async function runSpeedTest() {
+        const btn = document.getElementById('startBtn');
+        const speedText = document.getElementById('speedValue');
+        const pingText = document.getElementById('pingVal');
+        const statusText = document.getElementById('status');
+        const prog = document.getElementById('progress');
+        const bar = document.getElementById('progressBar');
+
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+        prog.style.display = "block";
+        statusText.innerText = "جاري الفحص...";
+
+        // 1. قياس البنج (Ping)
+        const pStart = Date.now();
+        try {
+            await fetch("https://www.google.com/favicon.ico", { mode: 'no-cors', cache: 'no-store' });
+            pingText.innerText = Date.now() - pStart;
+        } catch(e) { pingText.innerText = "??"; }
+
+        // 2. فحص التحميل الحقيقي (Download)
+        const startTime = Date.now();
+        try {
+            const response = await fetch(testUrl + "?t=" + startTime);
+            const reader = response.body.getReader();
+            let received = 0;
+
+            while(true) {
+                const {done, value} = await reader.read();
+                if (done) break;
+                received += value.length;
+
+                // تحديث النسبة المئوية
+                let percent = (received / fileSize) * 100;
+                bar.style.width = Math.min(percent, 100) + "%";
+
+                // حساب السرعة الحالية
+                let timeNow = (Date.now() - startTime) / 1000;
+                if (timeNow > 0) {
+                    let mbps = ((received * 8) / (timeNow * 1024 * 1024)).toFixed(1);
+                    speedText.innerText = mbps;
+                }
+            }
+
+            statusText.innerText = "اكتمل";
+        } catch (error) {
+            statusText.innerText = "فشل الاتصال";
+            console.error(error);
+        }
+
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.innerText = "إعادة الفحص";
+    }
+</script>
+
+</body>
+</html>
