@@ -5,32 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REDLINE - Ultimate Speedtest</title>
     <style>
-        :root { --primary: #ff4b2b; --secondary: #ff416c; --bg: #0a0a0a; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 90%; max-width: 450px; background: var(--card); border-radius: 30px; padding: 40px; box-shadow: 0 20px 40px rgba(255, 75, 43, 0.15); border: 1px solid #1f1f1f; text-align: center; }
-        h1 { color: var(--primary); font-size: 24px; letter-spacing: 3px; margin-bottom: 30px; }
+        :root { --primary: #ff4b2b; --secondary: #ff416c; --bg: #0a0a0a; --card: #121212; --text: #e0e0e0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 90%; max-width: 420px; background: var(--card); border-radius: 35px; padding: 40px; box-shadow: 0 25px 50px rgba(255, 75, 43, 0.1); border: 1px solid #1f1f1f; text-align: center; }
+        h1 { color: var(--primary); font-size: 22px; letter-spacing: 4px; margin-bottom: 30px; font-weight: 800; }
         
-        .gauge-section { position: relative; height: 220px; display: flex; flex-direction: column; justify-content: center; }
-        #speedValue { font-size: 85px; font-weight: 900; background: linear-gradient(to bottom, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-        .unit { font-size: 18px; color: #666; font-weight: bold; }
+        .gauge-section { position: relative; height: 180px; display: flex; flex-direction: column; justify-content: center; margin-bottom: 20px; }
+        #speedValue { font-size: 90px; font-weight: 900; background: linear-gradient(to bottom, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        .unit { font-size: 16px; color: #555; font-weight: bold; letter-spacing: 2px; }
+        #testType { font-size: 13px; color: var(--primary); margin-top: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
-        .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 30px 0; }
-        .m-box { background: #1a1a1a; padding: 15px; border-radius: 15px; border: 1px solid #222; }
-        .m-box small { display: block; font-size: 10px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
-        .m-box span { font-weight: bold; color: var(--primary); font-size: 16px; }
+        .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 30px 0; }
+        .m-box { background: #181818; padding: 15px 10px; border-radius: 20px; border: 1px solid #252525; transition: 0.3s; }
+        .active-test { border-color: var(--primary); box-shadow: 0 0 15px rgba(255, 75, 43, 0.2); transform: scale(1.05); }
+        .m-box small { display: block; font-size: 10px; color: #777; margin-bottom: 6px; text-transform: uppercase; }
+        .m-box span { font-weight: 800; color: #fff; font-size: 18px; }
+        .m-box b { color: var(--primary); font-size: 10px; margin-left: 2px; }
 
-        .progress-bar { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
-        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); box-shadow: 0 0 10px var(--primary); transition: 0.3s; }
+        .progress-bar { width: 100%; height: 4px; background: #222; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.2s; }
 
-        button { background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
-        button:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(255, 75, 43, 0.4); }
-        button:disabled { background: #333; cursor: wait; opacity: 0.6; }
+        button { background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; border: none; width: 100%; padding: 20px; border-radius: 20px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; box-shadow: 0 10px 20px rgba(255, 75, 43, 0.3); }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #222; box-shadow: none; color: #444; cursor: not-allowed; }
 
-        .history { margin-top: 30px; text-align: left; }
-        .history h3 { font-size: 14px; color: #444; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        #historyList { list-style: none; padding: 0; max-height: 150px; overflow-y: auto; font-size: 12px; }
-        .h-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
-        .h-item span { color: #888; }
+        .history { margin-top: 35px; text-align: left; }
+        .history h3 { font-size: 12px; color: #555; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 10px; letter-spacing: 1px; }
+        #historyList { list-style: none; padding: 0; max-height: 120px; overflow-y: auto; }
+        .h-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #181818; font-size: 13px; }
+        .h-item b { color: #aaa; }
+        .h-item span { color: #555; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -41,33 +45,38 @@
     <div class="gauge-section">
         <div id="speedValue">0.0</div>
         <div class="unit">MBPS</div>
-        <div id="testType" style="font-size: 12px; color: #ff4b2b; margin-top: 10px; font-weight: bold;">READY</div>
+        <div id="testType">READY</div>
     </div>
 
     <div class="progress-bar"><div id="barFill"></div></div>
 
     <div class="metrics">
-        <div class="m-box"><small>Ping</small><span id="ping">--</span></div>
-        <div class="m-box"><small>Download</small><span id="down">--</span></div>
-        <div class="m-box"><small>Upload</small><span id="up">--</span></div>
+        <div class="m-box" id="box-ping"><small>Ping</small><span id="ping">0</span><b>ms</b></div>
+        <div class="m-box" id="box-down"><small>Down</small><span id="down">0.0</span></div>
+        <div class="m-box" id="box-up"><small>Up</small><span id="up">0.0</span></div>
     </div>
 
     <button id="startBtn" onclick="runFullTest()">Start Test</button>
 
     <div class="history">
-        <h3>LATEST RESULTS</h3>
+        <h3>RECENT ACTIVITY</h3>
         <div id="historyList"></div>
     </div>
 </div>
 
 <script>
+    // High-speed reliable test files
     const config = {
-        downUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%287eaed92d-9473-4560-b88d-797593906660%29.jpg",
+        downUrl: "https://cloudflare.com/cdn-cgi/trace", // Used for ping/small check
+        largeFile: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Pleiades_large.jpg", // ~20MB reliable file
         upUrl: "https://httpbin.org/post",
-        downSize: 5242880 // 5MB
+        expectedSize: 15000000 // 15MB estimation for progress bar
     };
 
-    function updateUI(id, val) { document.getElementById(id).innerText = val; }
+    function setActive(id) {
+        document.querySelectorAll('.m-box').forEach(b => b.classList.remove('active-test'));
+        if(id) document.getElementById('box-' + id).classList.add('active-test');
+    }
 
     async function runFullTest() {
         const btn = document.getElementById('startBtn');
@@ -75,61 +84,70 @@
         const type = document.getElementById('testType');
         
         btn.disabled = true;
+        btn.innerText = "TESTING...";
         bar.style.width = "0%";
         
         // 1. PING
-        type.innerText = "MEASURING PING...";
+        type.innerText = "Checking Ping...";
+        setActive('ping');
         const pStart = Date.now();
-        await fetch("https://www.google.com/favicon.ico", { mode: 'no-cors', cache: 'no-store' });
-        const ping = Date.now() - pStart;
-        updateUI('ping', ping);
+        try {
+            await fetch(config.downUrl, { mode: 'no-cors', cache: 'no-store' });
+            const ping = Date.now() - pStart;
+            document.getElementById('ping').innerText = ping;
+        } catch(e) { document.getElementById('ping').innerText = "err"; }
 
         // 2. DOWNLOAD
-        type.innerText = "TESTING DOWNLOAD...";
+        type.innerText = "Testing Download...";
+        setActive('down');
         const dStart = Date.now();
-        const response = await fetch(config.downUrl + "?cb=" + dStart);
-        const reader = response.body.getReader();
-        let received = 0;
-        
-        while(true) {
-            const {done, value} = await reader.read();
-            if (done) break;
-            received += value.length;
-            let time = (Date.now() - dStart) / 1000;
-            let mbps = ((received * 8) / (time * 1024 * 1024)).toFixed(1);
-            updateUI('speedValue', mbps);
-            bar.style.width = (received / config.downSize * 50) + "%";
-        }
-        const finalDown = document.getElementById('speedValue').innerText;
-        updateUI('down', finalDown);
+        try {
+            const response = await fetch(config.largeFile + "?cb=" + dStart);
+            const reader = response.body.getReader();
+            let received = 0;
+            
+            while(true) {
+                const {done, value} = await reader.read();
+                if (done) break;
+                received += value.length;
+                let time = (Date.now() - dStart) / 1000;
+                let mbps = ((received * 8) / (time * 1024 * 1024)).toFixed(1);
+                document.getElementById('speedValue').innerText = mbps;
+                document.getElementById('down').innerText = mbps;
+                bar.style.width = Math.min((received / config.expectedSize * 100), 100) + "%";
+            }
+        } catch(e) { console.error("Download Error"); }
 
-        // 3. UPLOAD (Using a dummy 2MB data blob)
-        type.innerText = "TESTING UPLOAD...";
-        const upData = new Uint8Array(2000000); 
+        const finalDown = document.getElementById('down').innerText;
+
+        // 3. UPLOAD
+        type.innerText = "Testing Upload...";
+        setActive('up');
+        bar.style.width = "0%";
+        const upData = new Uint8Array(4000000); // 4MB for better accuracy
         const uStart = Date.now();
         
-        await fetch(config.upUrl, {
-            method: 'POST',
-            body: upData
-        });
-        
-        const uEnd = Date.now();
-        const uDuration = (uEnd - uStart) / 1000;
-        const upMbps = ((upData.length * 8) / (uDuration * 1024 * 1024)).toFixed(1);
-        
-        updateUI('speedValue', upMbps);
-        updateUI('up', upMbps);
-        bar.style.width = "100%";
-        type.innerText = "TEST COMPLETE";
+        try {
+            await fetch(config.upUrl, { method: 'POST', body: upData });
+            const uEnd = Date.now();
+            const uDuration = (uEnd - uStart) / 1000;
+            const upMbps = ((upData.length * 8) / (uDuration * 1024 * 1024)).toFixed(1);
+            
+            document.getElementById('speedValue').innerText = upMbps;
+            document.getElementById('up').innerText = upMbps;
+            bar.style.width = "100%";
+        } catch(e) { document.getElementById('up').innerText = "0.0"; }
 
-        saveResult(finalDown, upMbps, ping);
+        type.innerText = "TEST COMPLETE";
+        setActive(null);
+        saveResult(finalDown, document.getElementById('up').innerText, document.getElementById('ping').innerText);
         btn.disabled = false;
         btn.innerText = "Retest";
     }
 
     function saveResult(d, u, p) {
         let history = JSON.parse(localStorage.getItem('speedHistory') || "[]");
-        history.unshift({d, u, p, time: new Date().toLocaleTimeString()});
+        history.unshift({d, u, p, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})});
         if(history.length > 5) history.pop();
         localStorage.setItem('speedHistory', JSON.stringify(history));
         loadHistory();
